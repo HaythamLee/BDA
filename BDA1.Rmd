@@ -1,0 +1,64 @@
+---
+title: "Housing Affordability Data System"
+date: "2020年4月8日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(mice)
+library(scales)
+library(VIM)
+library(plotly)
+library(reshape2)
+library(knitr)
+library(kableExtra)
+library(descr)
+library(table1)
+library(RColorBrewer)
+had <- read.csv("data/HAD.csv",na.strings = "B")
+attach(had)
+```
+
+## Data Source and Introduction
+<font size="3">**Name:**</font>
+  
+BDA Senior
+
+<font size="3">**From:**</font>
+
+OFFICE OF POLICY DEVELOPMENT AND RESEARCH (PD&R)
+
+<font size="3">**Introduction:**</font>
+
+The Housing Affordability Data System (HADS) is a set of files derived from the 1985 and later national American Housing Survey (AHS) and the 2002 and later Metro AHS. This system categorizes housing units by affordability and households by income, with respect to the Adjusted Median Income, Fair Market Rent (FMR), and poverty income. It also includes housing cost burden for owner and renter households. These files have been the basis for the worst case needs tables since 2001. The data files are available for public use, since they were derived from AHS public use files and the published income limits and FMRs. We are providing these files give the community of housing analysts the opportunity to use a consistent set of affordability measures.
+
+<font size="3">**Source:**</font>
+  
+AMERICAN HOUSING SURVEY: HOUSING AFFORDABILITY DATA SYSTEM
+
+<font size="3">**URL:**</font>
+  
+<https://www.huduser.gov/portal/datasets/hads/hads.html?fbclid=IwAR2vqJWCdRv4mAahxTtWgBvFPwcUEPhje-hwC3TMLWU5IHkBBM5Y1PlDesA>.
+```{r had}
+
+```
+
+
+## Summary of Variable
+<font size="3">**Dependent Variable**</font>
+```{r had}
+summary(had)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
