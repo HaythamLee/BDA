@@ -18,7 +18,16 @@ library(kableExtra)
 library(descr)
 library(table1)
 library(RColorBrewer)
+my.col <- brewer.pal(n = 11, name = 'RdBu')
 had <- read.csv("data/HAD.csv",na.strings = "B")
+vars <- colnames(had)
+
+had[, c(1:99)] <- as.data.frame(matrix(as.numeric(unlist(had[, c(1:99)])), ncol=99))
+
+had$FMTSTRUCTURETYPE <- as.factor(had$FMTSTRUCTURETYPE)
+levels(had$FMTSTRUCTURETYPE)[1] <- "NA"
+had$FMTSTRUCTURETYPE <- as.character(had$FMTSTRUCTURETYPE)
+
 attach(had)
 ```
 
@@ -42,15 +51,15 @@ AMERICAN HOUSING SURVEY: HOUSING AFFORDABILITY DATA SYSTEM
 <font size="3">**URL:**</font>
   
 <https://www.huduser.gov/portal/datasets/hads/hads.html?fbclid=IwAR2vqJWCdRv4mAahxTtWgBvFPwcUEPhje-hwC3TMLWU5IHkBBM5Y1PlDesA>.
-```{r had}
-kab
-```
 
 
 ## Summary of Variable
-<font size="3">**Dependent Variable**</font>
-```{r had}
-summary(had)
+
+```{r indep, echo=FALSE}
+kable(rv, table.attr='class="table-fixed-header"') %>%
+  kable_styling() %>%
+  scroll_box(height="450px")
+
 ```
 
 ## Including Plots
