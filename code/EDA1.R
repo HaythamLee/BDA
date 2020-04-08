@@ -64,19 +64,27 @@ ggplot(had, aes(x=AGE1, color=METRO3)) +
 ##=========================================================
 ggplot(had, aes(x=FMTMETRO3, y=LMED, fill=FMTMETRO3)) + 
   geom_boxplot() +
-  scale_fill_brewer(palette="Set1")
+  scale_fill_brewer(palette="Set1") +
+  labs(title ="Area Average Income by Metro")
 
 ggplot(had, aes(x=FMTREGION, y=LMED, fill=FMTMETRO3)) + 
   geom_boxplot() +
-  scale_fill_brewer(palette="Set1")
+  scale_fill_brewer(palette="Set1") +
+  labs(title ="Area Average Income by Metro & Region")
 
 ggplot(had, aes(x=FMTMETRO3, y=TOTSAL, fill=FMTMETRO3)) + 
   geom_boxplot() +
   scale_fill_brewer(palette="Set1") +
-  ylim(NA, 2e+05)
+  ylim(NA, 2e+05) +
+  labs(title ="Wage Income by Metro")
 
 ggplot(had, aes(x=FMTREGION, y=TOTSAL, fill=FMTMETRO3)) + 
   geom_boxplot() +
   scale_fill_brewer(palette="Set1") +
-  ylim(NA, 2e+05)
+  ylim(NA, 2e+05) +
+  labs(title ="Wage Income by Metro & Region")
 
+ggplot(had, aes(x=FMTREGION, y=FMR, fill=FMTMETRO3)) + 
+  geom_boxplot() +
+  scale_fill_brewer(palette="Set1") +
+  labs(title ="Fair market Rent by Metro & Region")
