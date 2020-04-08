@@ -5,10 +5,11 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = F)
 library(ggplot2)
 library(knitr)
 library(dplyr)
+library(scales)
 library(mice)
 library(VIM)
 require(plyr)
@@ -19,7 +20,7 @@ library(tableone)
 library(gridExtra)
 library(reshape2)
 library(corrplot)
-my.col <- brewer.pal(n = 11, name = 'RdBu')
+# my.col <- brewer.pal(n = 11, name = 'RdBu')
 had <- read.csv("HAD.csv",na.strings = "B")
 hads <- fread("mice1.csv", header=T, sep=',')
 rv <- read.csv("rv.csv", header=F, sep=',')
@@ -121,13 +122,13 @@ kable(head(hads), table.attr='class="table-fixed-header"') %>%
 <!-- <font size="4">Predict the affordability of housing</font> -->
 
 ## Missing Values:
-```{r missing, echo=FALSE}
+```{r missing, echo=FALSE, results=F}
  had.aggrplot<-aggr(had, col=c('lightblue','red'),
                    numbers=TRUE, prop = TRUE, sortVars=TRUE,
                    labels=names(had), cex.axis=.7, gap=3)
 ```
 
-<!-- ## Exploratory Data Analysis -->
+## Exploratory Data Analysis
 
 <!-- ```{r seperate, include=FALSE} -->
 
@@ -150,7 +151,7 @@ kable(head(hads), table.attr='class="table-fixed-header"') %>%
 <!-- INCR <- cbind.data.frame(INCRELAMIPCT, INCRELFMRPCT, INCRELPOVPCT) %>% melt() -->
 <!-- INCR.mu <- ddply(INCR, "variable", summarise, mu=mean(value)) -->
 
-<!-- single.cont <- select(as.data.frame(hads.cont),  -->
+<!-- single.cont <- select(as.data.frame(hads.cont), -->
 <!--                       -starts_with("L"), -starts_with("ABL"), -starts_with("COST"), -starts_with("GL"), -starts_with("INCRE")) -->
 
 
@@ -179,31 +180,31 @@ kable(head(hads), table.attr='class="table-fixed-header"') %>%
 
 <!-- } -->
 
-
 <!-- ``` -->
-<!-- 從上面的圖形中我們可以發現，房間數越多，通常其家庭收入亦越多，但在房間數大於5後，反而會有平均收入下降的趨勢，離群值也隨著房間數增加，在大於5的房間之後離群值數量也有下降，數值也降低，房東與承租租者狀態分數越高，家庭收入卻越少，離群值的數量與數值也隨分數增加而下降，不同的普查地區出現的家庭收入分布接近一致，不過，郊區的家庭收入亦較市中心也比其他2者高，適當的家戶收入分佈較不適當的家戶高，建物的規模越大，家戶收入卻越低，單位臥室數分級數值越高，家戶收入也越高，自有住宅者的家戶收入也比租屋者高 -->
+
+從上面的圖形中我們可以發現，房間數越多，通常其家庭收入亦越多，但在房間數大於5後，反而會有平均收入下降的趨勢，離群值也隨著房間數增加，在大於5的房間之後離群值數量也有下降，數值也降低，房東與承租租者狀態分數越高，家庭收入卻越少，離群值的數量與數值也隨分數增加而下降，不同的普查地區出現的家庭收入分布接近一致，不過，郊區的家庭收入亦較市中心也比其他2者高，適當的家戶收入分佈較不適當的家戶高，建物的規模越大，家戶收入卻越低，單位臥室數分級數值越高，家戶收入也越高，自有住宅者的家戶收入也比租屋者高
 
 
 <!-- ```{r continuous plot1, echo=FALSE} -->
 
-<!-- ggplot(L,aes(x=value, fill=variable)) + geom_density(alpha=0.5) +  -->
-<!--   geom_vline(data=L.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) +  -->
+<!-- ggplot(L,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + -->
+<!--   geom_vline(data=L.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + -->
 <!--   ggtitle("低收入") -->
 
-<!-- ggplot(ABL,aes(x=value, fill=variable)) + geom_density(alpha=0.5) +  -->
-<!--   geom_vline(data=ABL.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) +  -->
+<!-- ggplot(ABL,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + -->
+<!--   geom_vline(data=ABL.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + -->
 <!--   ggtitle("對房間數調整後的低收入") -->
 
-<!-- ggplot(GL,aes(x=value, fill=variable)) + geom_density(alpha=0.5) +  -->
-<!--   geom_vline(data=GL.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) +  -->
+<!-- ggplot(GL,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + -->
+<!--   geom_vline(data=GL.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + -->
 <!--   ggtitle("調漲後的收入") -->
 
-<!-- ggplot(COST,aes(x=value, fill=variable)) + geom_density(alpha=0.5) +  -->
-<!--   geom_vline(data=COST.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) +  -->
+<!-- ggplot(COST,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + -->
+<!--   geom_vline(data=COST.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + -->
 <!--   ggtitle("居住費用") -->
 
-<!-- ggplot(INCR,aes(x=value, fill=variable)) + geom_density(alpha=0.5) +  -->
-<!--   geom_vline(data=INCR.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) +  -->
+<!-- ggplot(INCR,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + -->
+<!--   geom_vline(data=INCR.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + -->
 <!--   ggtitle("家庭收入") -->
 
 <!-- ``` -->
@@ -213,9 +214,9 @@ kable(head(hads), table.attr='class="table-fixed-header"') %>%
 <!-- for (i in 1:14) { -->
 <!--   par(mfrow=c(2, 1)) -->
 
-<!--   plot(density(single.cont[, i], na.rm=T),  -->
+<!--   plot(density(single.cont[, i], na.rm=T), -->
 <!--        main=paste(colnames(single.cont)[i], "distribution")) -->
-<!--   boxplot(single.cont[, i],  -->
+<!--   boxplot(single.cont[, i], -->
 <!--           main=paste(colnames(single.cont)[i], "boxplot"), horizontal=T) -->
 <!-- } -->
 
@@ -223,54 +224,54 @@ kable(head(hads), table.attr='class="table-fixed-header"') %>%
 
 <!-- ```{r corr plot, echo=FALSE} -->
 
-<!-- corrplot::corrplot(cor.cont, method="circle", col=my.col,  -->
+<!-- corrplot::corrplot(cor.cont, method="circle", col=my.col, -->
 <!--                    tl.col="black", tl.srt=45, diag=FALSE) -->
 
 <!-- ``` -->
 
-<!-- ```{r plot, echo=FALSE} -->
-<!-- pie <- function(x){ -->
-<!--   d = as.data.frame(table(x)) -->
-<!--   d <- d %>% -->
-<!--     # arrange(desc(x)) %>% -->
-<!--     mutate(prop = Freq / sum(d$Freq) *100) -->
-<!--   print(d) -->
+```{r plot, echo=FALSE}
+pie <- function(x){
+  d = as.data.frame(table(x))
+  d <- d %>%
+    # arrange(desc(x)) %>%
+    mutate(prop = Freq / sum(d$Freq) *100)
+  print(d)
 
-<!--   ggplot(d, aes(x="", y=Freq, fill=x)) + -->
-<!--     geom_bar(stat="identity", width=1, color="white") + -->
-<!--     coord_polar("y", start=0) + -->
-<!--     theme_void() + -->
-<!--     theme(legend.position="none") + -->
-<!--     scale_fill_brewer(palette="Blues")+ -->
-<!--     theme(axis.text.x=element_blank())+ -->
-<!--     geom_text(aes(label = paste(percent(prop/100),x, sep="\n")), size=5 -->
-<!--               , position = position_stack(vjust = 0.5)) -->
-<!-- } -->
-<!-- pie2 <- function(x){ -->
-<!--   d = as.data.frame(table(x)) -->
-<!--   d <- d %>% -->
-<!--     # arrange(desc(x)) %>% -->
-<!--     mutate(prop = Freq / sum(d$Freq) *100) -->
-<!--   print(d) -->
+  ggplot(d, aes(x="", y=Freq, fill=x)) +
+    geom_bar(stat="identity", width=1, color="white") +
+    coord_polar("y", start=0) +
+    theme_void() +
+    theme(legend.position="none") +
+    scale_fill_brewer(palette="Blues")+
+    theme(axis.text.x=element_blank())+
+    geom_text(aes(label = paste(percent(prop/100),x, sep="\n")), size=5
+              , position = position_stack(vjust = 0.5))
+}
+pie2 <- function(x){
+  d = as.data.frame(table(x))
+  d <- d %>%
+    # arrange(desc(x)) %>%
+    mutate(prop = Freq / sum(d$Freq) *100)
+  print(d)
 
-<!--   ggplot(d, aes(x="", y=Freq, fill=x)) + -->
-<!--     geom_bar(stat="identity", width=1, color="white") + -->
-<!--     coord_polar("y", start=0) + -->
-<!--     theme_void() + -->
-<!--     # theme(legend.position="none") + -->
-<!--     theme(legend.position = "right") + -->
-<!--     scale_fill_brewer(palette="Blues")+ -->
-<!--     theme(axis.text.x=element_blank())+ -->
-<!--     geom_text(aes(label = percent(prop/100)), size=5 -->
-<!--               , position = position_stack(vjust = 0.5)) -->
-<!-- } -->
+  ggplot(d, aes(x="", y=Freq, fill=x)) +
+    geom_bar(stat="identity", width=1, color="white") +
+    coord_polar("y", start=0) +
+    theme_void() +
+    # theme(legend.position="none") +
+    theme(legend.position = "right") +
+    scale_fill_brewer(palette="Blues")+
+    theme(axis.text.x=element_blank())+
+    geom_text(aes(label = percent(prop/100)), size=5
+              , position = position_stack(vjust = 0.5))
+}
 
-<!-- pie(FMTMETRO3) -->
-<!-- pie(FMTREGION) -->
-<!-- pie2(FMTBURDEN) -->
-<!-- ``` -->
+pie(had$FMTMETRO3)
+pie(had$FMTREGION)
+pie2(had$FMTBURDEN)
+```
 
-```{r plot1, echo=FALSE}
+```{r plot1, message=F}
 ggplot(had, aes(x=VALUE)) +
   geom_histogram(aes(y=..density..), colour="black", fill="white")+
   geom_density(alpha=.2, fill="#FF6666")

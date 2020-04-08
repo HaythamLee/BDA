@@ -4,7 +4,7 @@ lapply(pkg, library, character.only=T)
 
 had <- read.csv("data/HAD.csv",na.strings = "B")
 # str(had)
-s = summary(had)
+summary(had)
 attach(had)
 
 ##=========================================================
