@@ -87,4 +87,4 @@ ggplot(had, aes(x=FMTREGION, y=TOTSAL, fill=FMTMETRO3)) +
 ggplot(had, aes(x=FMTREGION, y=FMR, fill=FMTMETRO3)) + 
   geom_boxplot() +
   scale_fill_brewer(palette="Set1") +
-  labs(title ="Fair market Rent by Metro & Region")
+  labs(title ="Fair Market Rent by Metro & Region")
