@@ -1,0 +1,52 @@
+---
+title: "Big Data Analysis HW1"
+author: "Wei Chieh Chen"
+date: "2020<e6><92><9f><b4>4<e6><9c><88>7<e6>謑<99>"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(had)```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+pie <- function(x){
+  d = as.data.frame(table(x))
+  d <- d %>%
+    # arrange(desc(x)) %>%
+    mutate(prop = Freq / sum(d$Freq) *100)
+  print(d)
+  
+  ggplot(d, aes(x="", y=Freq, fill=x)) +
+    geom_bar(stat="identity", width=1, color="white") +
+    coord_polar("y", start=0) +
+    theme_void() +
+    theme(legend.position="none") +
+    scale_fill_brewer(palette="Blues")+
+    theme(axis.text.x=element_blank())+
+    geom_text(aes(label = paste(percent(prop/100),x, sep="\n")), size=5
+              , position = position_stack(vjust = 0.5))
+}
+
+pie(FMTMETRO3)
+pie(FMTREGION)
+pie(FMTBURDEN)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
