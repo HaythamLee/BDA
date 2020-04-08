@@ -88,3 +88,9 @@ ggplot(had, aes(x=FMTREGION, y=FMR, fill=FMTMETRO3)) +
   geom_boxplot() +
   scale_fill_brewer(palette="Set1") +
   labs(title ="Fair Market Rent by Metro & Region")
+
+ggplot(had, aes(x=FMTREGION, y=VALUE, fill=FMTMETRO3)) + 
+  geom_boxplot() +
+  scale_fill_brewer(palette="Set1") +
+  ylim(NA, 1e+06) +
+  labs(title ="Current Market Value by Metro & Region")
