@@ -20,7 +20,7 @@ library(gridExtra)
 library(reshape2)
 library(corrplot)
 my.col <- brewer.pal(n = 11, name = 'RdBu')
-setwd("D:/Oscar1082/bigdata/HADS")
+# setwd("D:/Oscar1082/bigdata/HADS")
 had <- read.csv("HAD.csv",na.strings = "B")
 hads <- fread("mice1.csv", header=T, sep=',')
 rv <- read.csv("rv.csv", header=F, sep=',')
@@ -250,14 +250,14 @@ pie(had$FMTBURDEN)
 
 ```
 
-```{r plot, echo=FALSE}
+```{r plot1, echo=FALSE}
 ggplot(had, aes(x=VALUE)) + 
   geom_histogram(aes(y=..density..), colour="black", fill="white")+
   geom_density(alpha=.2, fill="#FF6666") 
 ```
 
 ## Missing Values:
-```{r plot, echo=FALSE}
+```{missing, echo=FALSE}
  had.aggrplot<-aggr(had, col=c('lightblue','red'), 
                    numbers=TRUE, prop = TRUE, sortVars=TRUE, 
                    labels=names(had), cex.axis=.7, gap=3)
