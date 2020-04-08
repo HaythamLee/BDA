@@ -75,7 +75,6 @@ kable(head(hads), table.attr='class="table-fixed-header"') %>%
   kable_styling() %>%
   scroll_box(height="280px")
 ```
-
 ## Summary of Variables
 
 ```{r list3, include=FALSE}
