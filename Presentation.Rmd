@@ -1,0 +1,235 @@
+---
+title: "Presentation 1"
+date: "2020年4月9日"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = F)
+library(ggplot2)
+library(knitr)
+library(dplyr)
+library(scales)
+library(mice)
+library(VIM)
+require(plyr)
+library(kableExtra)
+# library(data.table)
+library(RColorBrewer)
+library(tableone)
+library(gridExtra)
+library(reshape2)
+library(corrplot)
+had <- read.csv("HADS/HAD.csv",na.strings = "B")
+hads <- read.table("HADS/mice1.csv", header=T, sep=',')
+housing <- read.table("HADS/mice1.csv", header=T, sep=',')
+rv <- read.csv("HADS/rv.csv", header=F, sep=',')
+vars <- colnames(hads)
+
+hads[, c(1:48)] <- as.data.frame(matrix(as.numeric(unlist(hads[, c(1:48)])), ncol=48))
+
+hads$FMTSTRUCTURETYPE <- as.factor(hads$FMTSTRUCTURETYPE)
+levels(hads$FMTSTRUCTURETYPE)[1] <- "NA"
+hads$FMTSTRUCTURETYPE <- as.character(hads$FMTSTRUCTURETYPE)
+
+nm <- function(x){sum(is.na(x))}
+miss.obs1 <- which(apply(hads, 1, nm)==16)
+miss.obs2 <- which(apply(hads, 1, nm)==17)
+miss.obs3 <- which(apply(hads, 1, nm)==18)
+miss <- c(miss.obs1, miss.obs2, miss.obs3)
+hads <- hads[-miss, ]
+attach(had)
+```
+
+## Data Source and Introduction 1
+<font size="3">**Name:**</font>
+
+Housing Affordability Data System
+
+<font size="3">**Introduction:**</font>
+
+住房負擔能力數據系統（HADS）是一套住房單位數據集，透過住房單位的地區收入中位數、貧困水平收入和公市場租金，衡量單位的負擔能力和住戶成本。這些數據集的目是為住房分析師提供長期負擔能力和的一致措施。
+
+## Data Source and Introduction 2
+<font size="3">**Source:**</font>
+
+United States Department of Housing and Urban Development (HUD) 
+
+<font size="3">**URL:**</font>
+
+<https://catalog.data.gov/dataset/housing-affordability-data-system-hads>.
+
+## Variable Description
+解釋變數：45個連續變數，11個類別變數
+反應變數：1個連續變數
+
+```{r indep, echo=FALSE}
+kable(rv, table.attr='class="table-fixed-header"') %>%
+  kable_styling() %>%
+  scroll_box(height="450px")
+
+```
+
+## Summary of Variables 1
+
+```{r list, include=FALSE}
+cate <- as.vector(vars[which(rv[, 2]==c("Categorical"))]) 
+cont <- vars[which(rv[, 2]==c("Continuous"))] 
+cattable <- CreateCatTable(vars = cate, data = housing, includeNA = T) 
+conttable <- CreateContTable(vars = cont, data = housing, funcNames = c("n", "miss", "p.miss", "mean", "sd", "median", "min", "max")) 
+restable <- CreateContTable(vars = "ZINC2", data = housing, funcNames = c("n", "miss", "p.miss", "mean", "sd", "median", "min", "max")) 
+
+a <- print(cattable, showAllLevels = TRUE) 
+b <- as.matrix(conttable[["Overall"]]) %>% 
+      format(scientific=F) 
+c <- as.matrix(restable[["Overall"]]) %>% 
+      format(scientific=F) 
+``` 
+
+<font size="4">**Categorical Variables**</font>
+
+```{r category, echo=FALSE} 
+kable(a, table.attr='class="table-fixed-header"') %>% 
+ kable_styling() %>% 
+ scroll_box(height="500px") 
+``` 
+
+## Summary of Variables 2
+ <font size="4">**Continuous Variables**</font> 
+
+```{r continuous, echo=FALSE} 
+kable(b, table.attr='class="table-fixed-header"') %>% 
+   kable_styling() %>% 
+   scroll_box(height="500px") 
+``` 
+
+## Summary of Variables 3
+<font size="4">**Response Variable to Be Predicted**</font> 
+
+```{r response, echo=FALSE} 
+kable(c, table.attr='class="table-fixed-header"') %>% 
+ kable_styling() %>%
+ scroll_box(height="150px")
+``` 
+
+## Research Problem
+
+<font size="4">Predict the affordability of housing</font> 
+
+## Missing Values
+missing at random, delete the variable.
+
+```{r missing, echo=FALSE, results=F}
+ had.aggrplot<-aggr(had, col=c('lightblue','red'),
+                   numbers=TRUE, prop = TRUE, sortVars=TRUE,
+                   labels=names(had), cex.axis=.7, gap=3)
+```
+
+
+## EDA Plot: Pie Chart
+```{r plot, echo=FALSE}
+pie <- function(x){
+  d = as.data.frame(table(x))
+  d <- d %>%
+    # arrange(desc(x)) %>%
+    mutate(prop = Freq / sum(d$Freq) *100)
+  print(d)
+
+  ggplot(d, aes(x="", y=Freq, fill=x)) +
+    geom_bar(stat="identity", width=1, color="white") +
+    coord_polar("y", start=0) +
+    theme_void() +
+    theme(legend.position="none") +
+    scale_fill_brewer(palette="Blues")+
+    theme(axis.text.x=element_blank())+
+    geom_text(aes(label = paste(percent(prop/100),x, sep="\n")), size=5
+              , position = position_stack(vjust = 0.5))
+}
+pie2 <- function(x){
+  d = as.data.frame(table(x))
+  d <- d %>%
+    # arrange(desc(x)) %>%
+    mutate(prop = Freq / sum(d$Freq) *100)
+  print(d)
+
+  ggplot(d, aes(x="", y=Freq, fill=x)) +
+    geom_bar(stat="identity", width=1, color="white") +
+    coord_polar("y", start=0) +
+    theme_void() +
+    # theme(legend.position="none") +
+    theme(legend.position = "right") +
+    scale_fill_brewer(palette="Blues")+
+    theme(axis.text.x=element_blank())+
+    geom_text(aes(label = percent(prop/100)), size=5
+              , position = position_stack(vjust = 0.5))
+}
+
+pie(had$FMTMETRO3)
+
+```
+
+## EDA Plot: Pie Chart 2
+```{r plot2, message=F}
+pie(had$FMTREGION)
+```
+
+## EDA Plot: Pie Chart 3
+```{r plot3, message=F}
+pie2(had$FMTBURDEN)
+```
+
+## EDA Plot : GGPLOT
+```{r plot4, message=F}
+ggplot(had, aes(x=VALUE)) +
+  geom_histogram(aes(y=..density..), colour="black", fill="white")+
+  geom_density(alpha=.2, fill="#FF6666")
+```
+
+## EDA Plot : GGPLOT 1
+```{r plot5, message=F}
+ggplot(had, aes(x=TOTSAL)) +
+  geom_histogram(aes(y=stat(density)), colour="black", fill="white")+
+  geom_density(alpha=.2, fill="#FF6666")
+```
+
+## EDA Plot : GGPLOT 2
+```{r plot6, message=F}
+ggplot(had, aes(x=AGE1, color=METRO3)) +
+  geom_histogram(aes(y=stat(density)), colour="black", fill="white")+
+  geom_density(alpha=.2, fill="#FF6666")
+```
+
+## EDA Plot : GGPLOT 3
+```{r plot7, ehco=FALSE}
+ggplot(had, aes(x=FMTREGION, y=LMED, fill=FMTMETRO3)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette="Set1") +
+  labs(title ="Area Average Income by Metro & Region")
+```
+
+## EDA Plot : GGPLOT 4
+```{r plot8, ehco=FALSE}
+ggplot(had, aes(x=FMTREGION, y=TOTSAL, fill=FMTMETRO3)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette="Set1") +
+  ylim(NA, 2e+05) +
+  labs(title ="Wage Income by Metro & Region")
+```
+
+## EDA Plot : GGPLOT 5
+```{r plot9, ehco=FALSE}
+ggplot(had, aes(x=FMTREGION, y=FMR, fill=FMTMETRO3)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette="Set1") +
+  labs(title ="Fair Market Rent by Metro & Region")
+```
+
+## EDA Plot : GGPLOT 6
+```{r plot10, ehco=FALSE}
+ggplot(had, aes(x=FMTREGION, y=VALUE, fill=FMTMETRO3)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette="Set1") +
+  ylim(NA, 1e+06) +
+  labs(title ="Current Market Value by Metro & Region")
+```
+
