@@ -60,7 +60,8 @@ United States Department of Housing and Urban Development (HUD)
 <https://catalog.data.gov/dataset/housing-affordability-data-system-hads>.
 
 ## Variable Description
-
+解釋變數：45個連續變數，11個類別變數
+反應變數：1個連續變數
 
 ```{r indep, echo=FALSE}
 kable(rv, table.attr='class="table-fixed-header"') %>%
