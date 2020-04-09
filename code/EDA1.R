@@ -1,5 +1,6 @@
 ## packages=======================================================
-pkg <- c("dplyr", "ggplot2", "scales")
+pkg <- c("dplyr", "ggplot2", "mice", "scales", "VIM",
+         "plotly", "ggpubr", "reshape2", "knitr", "kableExtra", "descr", "table1", "RColorBrewer")
 lapply(pkg, library, character.only=T)
 
 had <- read.csv("data/HAD.csv",na.strings = "B")
@@ -25,72 +26,12 @@ pie <- function(x){
     geom_text(aes(label = paste(percent(prop/100),x, sep="\n")), size=5
               , position = position_stack(vjust = 0.5))
 }
-pie2 <- function(x){
-  d = as.data.frame(table(x))
-  d <- d %>%
-    # arrange(desc(x)) %>%
-    mutate(prop = Freq / sum(d$Freq) *100)
-  print(d)
-  
-  ggplot(d, aes(x="", y=Freq, fill=x)) +
-    geom_bar(stat="identity", width=1, color="white") +
-    coord_polar("y", start=0) +
-    theme_void() +
-    # theme(legend.position="none") +
-    theme(legend.position = "right") +
-    scale_fill_brewer(palette="Blues")+
-    theme(axis.text.x=element_blank())+
-    geom_text(aes(label = percent(prop/100)), size=5
-              , position = position_stack(vjust = 0.5))
-}
 
 pie(FMTMETRO3)
 pie(FMTREGION)
-pie2(FMTBURDEN)
+pie(FMTBURDEN)
 
 ##=========================================================
 ggplot(had, aes(x=VALUE)) + 
   geom_histogram(aes(y=..density..), colour="black", fill="white")+
   geom_density(alpha=.2, fill="#FF6666") 
-
-ggplot(had, aes(x=TOTSAL)) + 
-  geom_histogram(aes(y=stat(density)), colour="black", fill="white")+
-  geom_density(alpha=.2, fill="#FF6666") 
-
-ggplot(had, aes(x=AGE1, color=METRO3)) +
-  geom_histogram(aes(y=stat(density)), colour="black", fill="white")+
-  geom_density(alpha=.2, fill="#FF6666") 
-
-##=========================================================
-ggplot(had, aes(x=FMTMETRO3, y=LMED, fill=FMTMETRO3)) + 
-  geom_boxplot() +
-  scale_fill_brewer(palette="Set1") +
-  labs(title ="Area Average Income by Metro")
-
-ggplot(had, aes(x=FMTREGION, y=LMED, fill=FMTMETRO3)) + 
-  geom_boxplot() +
-  scale_fill_brewer(palette="Set1") +
-  labs(title ="Area Average Income by Metro & Region")
-
-ggplot(had, aes(x=FMTMETRO3, y=TOTSAL, fill=FMTMETRO3)) + 
-  geom_boxplot() +
-  scale_fill_brewer(palette="Set1") +
-  ylim(NA, 2e+05) +
-  labs(title ="Wage Income by Metro")
-
-ggplot(had, aes(x=FMTREGION, y=TOTSAL, fill=FMTMETRO3)) + 
-  geom_boxplot() +
-  scale_fill_brewer(palette="Set1") +
-  ylim(NA, 2e+05) +
-  labs(title ="Wage Income by Metro & Region")
-
-ggplot(had, aes(x=FMTREGION, y=FMR, fill=FMTMETRO3)) + 
-  geom_boxplot() +
-  scale_fill_brewer(palette="Set1") +
-  labs(title ="Fair Market Rent by Metro & Region")
-
-ggplot(had, aes(x=FMTREGION, y=VALUE, fill=FMTMETRO3)) + 
-  geom_boxplot() +
-  scale_fill_brewer(palette="Set1") +
-  ylim(NA, 1e+06) +
-  labs(title ="Current Market Value by Metro & Region")
