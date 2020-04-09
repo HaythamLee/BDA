@@ -1,5 +1,5 @@
 ---
-title: "Presentation 1"
+title: "BDA Presentation 1"
 date: "2020年4月9日"
 output: ioslides_presentation
 ---
@@ -114,11 +114,11 @@ kable(c, table.attr='class="table-fixed-header"') %>%
 
 ## Research Problem
 
-<font size="4">Predict the affordability of housing</font> 
+Predict the affordability of housing.
+Predict the fair market rent.
 
 ## Missing Values
-missing at random, delete the variable.
-
+Vacancy: if the house is not in use, it would be missing values.
 ```{r missing, echo=FALSE, results=F}
  had.aggrplot<-aggr(had, col=c('lightblue','red'),
                    numbers=TRUE, prop = TRUE, sortVars=TRUE,
@@ -169,67 +169,61 @@ pie(had$FMTMETRO3)
 ```
 
 ## EDA Plot: Pie Chart 2
-```{r plot2, message=F}
+```{r plot2, echo=F}
 pie(had$FMTREGION)
 ```
 
 ## EDA Plot: Pie Chart 3
-```{r plot3, message=F}
+```{r plot3, echo=F}
 pie2(had$FMTBURDEN)
 ```
 
 ## EDA Plot : GGPLOT
-```{r plot4, message=F}
+```{r plot4, echo=F}
 ggplot(had, aes(x=VALUE)) +
   geom_histogram(aes(y=..density..), colour="black", fill="white")+
   geom_density(alpha=.2, fill="#FF6666")
 ```
 
 ## EDA Plot : GGPLOT 1
-```{r plot5, message=F}
+```{r plot5, echo=F}
 ggplot(had, aes(x=TOTSAL)) +
   geom_histogram(aes(y=stat(density)), colour="black", fill="white")+
   geom_density(alpha=.2, fill="#FF6666")
 ```
 
 ## EDA Plot : GGPLOT 2
-```{r plot6, message=F}
+```{r plot6, echo=FALSE}
 ggplot(had, aes(x=AGE1, color=METRO3)) +
   geom_histogram(aes(y=stat(density)), colour="black", fill="white")+
   geom_density(alpha=.2, fill="#FF6666")
 ```
 
 ## EDA Plot : GGPLOT 3
-```{r plot7, ehco=FALSE}
-ggplot(had, aes(x=FMTREGION, y=LMED, fill=FMTMETRO3)) +
-  geom_boxplot() +
+```{r plot7, ehco=FALSE, result=FALSE}
+ggplot(had, aes(x=FMTREGION, y=LMED, fill=FMTMETRO3))+geom_boxplot() +
   scale_fill_brewer(palette="Set1") +
   labs(title ="Area Average Income by Metro & Region")
 ```
 
 ## EDA Plot : GGPLOT 4
-```{r plot8, ehco=FALSE}
-ggplot(had, aes(x=FMTREGION, y=TOTSAL, fill=FMTMETRO3)) +
-  geom_boxplot() +
-  scale_fill_brewer(palette="Set1") +
-  ylim(NA, 2e+05) +
+```{r plot8, ehco=FALSE, result=FALSE}
+ggplot(had, aes(x=FMTREGION, y=TOTSAL, fill=FMTMETRO3))+geom_boxplot() +
+  scale_fill_brewer(palette="Set1")+ylim(NA, 2e+05)+
   labs(title ="Wage Income by Metro & Region")
 ```
 
 ## EDA Plot : GGPLOT 5
-```{r plot9, ehco=FALSE}
-ggplot(had, aes(x=FMTREGION, y=FMR, fill=FMTMETRO3)) +
-  geom_boxplot() +
-  scale_fill_brewer(palette="Set1") +
+```{r plot9, ehco=FALSE, result=FALSE}
+ggplot(had, aes(x=FMTREGION, y=FMR, fill=FMTMETRO3))+geom_boxplot() +
+  scale_fill_brewer(palette="Set1")+
   labs(title ="Fair Market Rent by Metro & Region")
 ```
 
 ## EDA Plot : GGPLOT 6
-```{r plot10, ehco=FALSE}
-ggplot(had, aes(x=FMTREGION, y=VALUE, fill=FMTMETRO3)) +
-  geom_boxplot() +
-  scale_fill_brewer(palette="Set1") +
-  ylim(NA, 1e+06) +
+```{r plot10, ehco=FALSE, result=FALSE}
+ggplot(had, aes(x=FMTREGION, y=VALUE, fill=FMTMETRO3))+geom_boxplot()+
+  scale_fill_brewer(palette="Set1")+ylim(NA, 1e+06)+
   labs(title ="Current Market Value by Metro & Region")
 ```
 
