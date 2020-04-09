@@ -41,6 +41,10 @@ miss <- c(miss.obs1, miss.obs2, miss.obs3)
 hads <- hads[-miss, ]
 attach(had)
 ```
+## Group Introduction
+<font size="3">**Name:**</font>
+
+410578043 Haytham Lee 410578068 Wei Chieh Chen
 
 ## Data Source and Introduction
 <font size="3">**Name:**</font>
