@@ -6,6 +6,6 @@ summary(had)
 library(mice)
 # install.packages("VIM")
 library(VIM) 
-hw1.aggrplot<-aggr(had, col=c('lightblue','red'), 
+had.aggrplot<-aggr(had, col=c('lightblue','red'), 
                    numbers=TRUE, prop = TRUE, sortVars=TRUE, 
                    labels=names(had), cex.axis=.7, gap=3)
