@@ -14,7 +14,7 @@ library(mice)
 library(VIM)
 require(plyr)
 library(kableExtra)
-library(data.table)
+# library(data.table)
 library(RColorBrewer)
 library(tableone)
 library(gridExtra)
@@ -22,7 +22,8 @@ library(reshape2)
 library(corrplot)
 # my.col <- brewer.pal(n = 11, name = 'RdBu')
 had <- read.csv("HAD.csv",na.strings = "B")
-hads <- fread("mice1.csv", header=T, sep=',')
+hads <- read.table("mice1.csv", header=T, sep=',')
+housing <- read.table("mice1.csv", header=T, sep=',')
 rv <- read.csv("rv.csv", header=F, sep=',')
 vars <- colnames(hads)
 
@@ -38,7 +39,7 @@ miss.obs2 <- which(apply(hads, 1, nm)==17)
 miss.obs3 <- which(apply(hads, 1, nm)==18)
 miss <- c(miss.obs1, miss.obs2, miss.obs3)
 hads <- hads[-miss, ]
-attach(hads)
+attach(had)
 ```
 
 ## Data Source and Introduction
@@ -71,57 +72,57 @@ kable(rv, table.attr='class="table-fixed-header"') %>%
 ## Data Appearance
 
 ```{r data, echo=FALSE}
-kable(head(hads), table.attr='class="table-fixed-header"') %>%
+kable(head(housing), table.attr='class="table-fixed-header"') %>%
   kable_styling() %>%
-  scroll_box(height="280px")
+  scroll_box(height=F)
 ```
-<!-- ## Summary of Variables -->
+## Summary of Variables
 
-<!-- ```{r list3, include=FALSE} -->
-<!-- cate <- as.vector(vars[which(rv[, 2]==c("Categorical"))]) -->
-<!-- cont <- vars[which(rv[, 2]==c("Continuous"))] -->
-<!-- cattable <- CreateCatTable(vars = cate, data = hads, includeNA = T) -->
-<!-- conttable <- CreateContTable(vars = cont, data = hads,  -->
-<!--                              funcNames = c("n", "miss", "p.miss", "mean", "sd", "median", "min", "max")) -->
-<!-- restable <- CreateContTable(vars = "ZINC2", data = hads,  -->
-<!--                            funcNames = c("n", "miss", "p.miss", "mean", "sd", "median", "min", "max")) -->
+```{r list, include=FALSE}
+cate <- as.vector(vars[which(rv[, 2]==c("Categorical"))]) 
+cont <- vars[which(rv[, 2]==c("Continuous"))] 
+cattable <- CreateCatTable(vars = cate, data = housing, includeNA = T) 
+conttable <- CreateContTable(vars = cont, data = housing, funcNames = c("n", "miss", "p.miss", "mean", "sd", "median", "min", "max")) 
+restable <- CreateContTable(vars = "ZINC2", data = housing, funcNames = c("n", "miss", "p.miss", "mean", "sd", "median", "min", "max")) 
 
-<!-- a <- print(cattable, showAllLevels = TRUE) -->
-<!-- b <- as.matrix(conttable[["Overall"]]) %>% -->
-<!--      format(scientific=F) -->
-<!-- c <- as.matrix(restable[["Overall"]]) %>% -->
-<!--      format(scientific=F) -->
-<!-- ``` -->
+a <- print(cattable, showAllLevels = TRUE) 
+b <- as.matrix(conttable[["Overall"]]) %>% 
+      format(scientific=F) 
+c <- as.matrix(restable[["Overall"]]) %>% 
+      format(scientific=F) 
+``` 
 
-<!-- <font size="4">**Categorical Variables**</font> -->
+<font size="4">**Categorical Variables**</font>
 
-<!-- ```{r category, echo=FALSE} -->
-<!-- kable(a, table.attr='class="table-fixed-header"') %>% -->
-<!--   kable_styling() %>% -->
-<!--   scroll_box(height="500px") -->
-<!-- ``` -->
+```{r category, echo=FALSE} 
+kable(a, table.attr='class="table-fixed-header"') %>% 
+ kable_styling() %>% 
+ scroll_box(height="500px") 
+``` 
 
-<!-- <font size="4">**Continuous Variables**</font> -->
+ <font size="4">**Continuous Variables**</font> 
 
-<!-- ```{r continuous, echo=FALSE} -->
-<!-- kable(b, table.attr='class="table-fixed-header"') %>% -->
-<!--   kable_styling() %>% -->
-<!--   scroll_box(height="500px") -->
-<!-- ``` -->
+```{r continuous, echo=FALSE} 
+kable(b, table.attr='class="table-fixed-header"') %>% 
+   kable_styling() %>% 
+   scroll_box(height="500px") 
+``` 
 
-<!-- <font size="4">**Response Variable to Be Predicted**</font> -->
+<font size="4">**Response Variable to Be Predicted**</font> 
 
-<!-- ```{r response, echo=FALSE} -->
-<!-- kable(c, table.attr='class="table-fixed-header"') %>% -->
-<!--   kable_styling() %>% -->
-<!--   scroll_box(height="150px") -->
-<!-- ``` -->
+```{r response, echo=FALSE} 
+kable(c, table.attr='class="table-fixed-header"') %>% 
+ kable_styling() %>%
+ scroll_box(height="150px")
+``` 
 
-<!-- ## Research Problem: -->
+## Research Problem
 
-<!-- <font size="4">Predict the affordability of housing</font> -->
+<font size="4">Predict the affordability of housing</font> 
 
-## Missing Values:
+## Missing Values
+missing at random, delete the variable.
+
 ```{r missing, echo=FALSE, results=F}
  had.aggrplot<-aggr(had, col=c('lightblue','red'),
                    numbers=TRUE, prop = TRUE, sortVars=TRUE,
@@ -130,104 +131,102 @@ kable(head(hads), table.attr='class="table-fixed-header"') %>%
 
 ## Exploratory Data Analysis
 
-<!-- ```{r seperate, include=FALSE} -->
+```{r seperate, include=FALSE}
 
-<!-- hads.cont <- apply(as.matrix(hads)[, cont], 2, as.numeric) -->
-<!-- hads.cate <- as.matrix(hads)[, cate] -->
-<!-- cor.cont <- cor(hads.cont, use = "pairwise.complete.obs") -->
+hads.cont <- apply(as.matrix(housing)[, cont], 2, as.numeric) 
+hads.cate <- as.matrix(housing)[, cate] 
+cor.cont <- cor(hads.cont, use = "pairwise.complete.obs")
 
-<!-- #類別變數作圖function -->
-
-
-<!-- #連續變數作圖用的data -->
-<!-- L <- cbind.data.frame(L30, L50, L80, LMED) %>% melt() -->
-<!-- L.mu <- ddply(L, "variable", summarise, mu=mean(value)) -->
-<!-- ABL <- cbind.data.frame(ABL30, ABL50, ABL80, ABLMED) %>% melt() -->
-<!-- ABL.mu <- ddply(ABL, "variable", summarise, mu=mean(value)) -->
-<!-- COST <- cbind.data.frame(COST06, COST08, COST12, COSTMED) %>% melt() -->
-<!-- COST.mu <- ddply(COST, "variable", summarise, mu=mean(value)) -->
-<!-- GL <- cbind.data.frame(GL30, GL50, GL80, GLMED) %>% melt() -->
-<!-- GL.mu <- ddply(GL, "variable", summarise, mu=mean(value)) -->
-<!-- INCR <- cbind.data.frame(INCRELAMIPCT, INCRELFMRPCT, INCRELPOVPCT) %>% melt() -->
-<!-- INCR.mu <- ddply(INCR, "variable", summarise, mu=mean(value)) -->
-
-<!-- single.cont <- select(as.data.frame(hads.cont), -->
-<!--                       -starts_with("L"), -starts_with("ABL"), -starts_with("COST"), -starts_with("GL"), -starts_with("INCRE")) -->
+#類別變數作圖function 
 
 
-<!-- ``` -->
+#連續變數作圖用的data -->
+L <- cbind.data.frame(L30, L50, L80, LMED) %>% melt() 
+L.mu <- ddply(L, "variable", summarise, mu=mean(value)) 
+ABL <- cbind.data.frame(ABL30, ABL50, ABL80, ABLMED) %>% melt() 
+ABL.mu <- ddply(ABL, "variable", summarise, mu=mean(value)) 
+COST <- cbind.data.frame(COST06, COST08, COST12, COSTMED) %>% melt() 
+COST.mu <- ddply(COST, "variable", summarise, mu=mean(value)) 
+GL <- cbind.data.frame(GL30, GL50, GL80, GLMED) %>% melt() 
+GL.mu <- ddply(GL, "variable", summarise, mu=mean(value)) 
+INCR <- cbind.data.frame(INCRELAMIPCT, INCRELFMRPCT, INCRELPOVPCT) %>% melt() 
+INCR.mu <- ddply(INCR, "variable", summarise, mu=mean(value)) 
+
+single.cont <- select(as.data.frame(hads.cont),
+                      -starts_with("L"), -starts_with("ABL"), -starts_with("COST"), -starts_with("GL"), -starts_with("INCRE")) 
 
 
-<!-- ```{r categorical plot, echo=FALSE} -->
-
-<!-- ZINC2 <- as.numeric(hads$ZINC2) -->
-<!-- for (i in 1:9) { -->
-
-<!--   f <- as.factor(hads.cate[, i]) -->
-
-<!--   plot1 <- -->
-<!--     ggplot(hads, aes(x = ZINC2, fill = f, color = f)) + -->
-<!--     geom_density(alpha = .3) + -->
-<!--     ggtitle(paste0(colnames(hads.cate)[i], "*ZINC2 densityplot")) -->
-
-<!--   plot2 <- -->
-<!--     ggplot(hads, aes(x = f, y = ZINC2, color = f, group = f)) + -->
-<!--     geom_boxplot() + -->
-<!--     ggtitle(paste0(colnames(hads.cate)[i], "*ZINC2 boxplot")) + -->
-<!--     xlab(colnames(hads.cate)[i]) -->
-
-<!-- grid.arrange(plot1, plot2, nrow = 2) -->
-
-<!-- } -->
-
-<!-- ``` -->
-
-從上面的圖形中我們可以發現，房間數越多，通常其家庭收入亦越多，但在房間數大於5後，反而會有平均收入下降的趨勢，離群值也隨著房間數增加，在大於5的房間之後離群值數量也有下降，數值也降低，房東與承租租者狀態分數越高，家庭收入卻越少，離群值的數量與數值也隨分數增加而下降，不同的普查地區出現的家庭收入分布接近一致，不過，郊區的家庭收入亦較市中心也比其他2者高，適當的家戶收入分佈較不適當的家戶高，建物的規模越大，家戶收入卻越低，單位臥室數分級數值越高，家戶收入也越高，自有住宅者的家戶收入也比租屋者高
+``` 
 
 
-<!-- ```{r continuous plot1, echo=FALSE} -->
+```{r categorical plot, echo=FALSE} 
 
-<!-- ggplot(L,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + -->
-<!--   geom_vline(data=L.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + -->
-<!--   ggtitle("低收入") -->
+ZINC2 <- as.numeric(hads$ZINC2) 
+ for (i in 1:9) { 
 
-<!-- ggplot(ABL,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + -->
-<!--   geom_vline(data=ABL.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + -->
-<!--   ggtitle("對房間數調整後的低收入") -->
+ f <- as.factor(hads.cate[, i]) 
 
-<!-- ggplot(GL,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + -->
-<!--   geom_vline(data=GL.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + -->
-<!--   ggtitle("調漲後的收入") -->
+   plot1 <- 
+     ggplot(housing, aes(x = ZINC2, fill = f, color = f)) + 
+     geom_density(alpha = .3) + 
+     ggtitle(paste0(colnames(hads.cate)[i], "*ZINC2 densityplot")) 
 
-<!-- ggplot(COST,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + -->
-<!--   geom_vline(data=COST.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + -->
-<!--   ggtitle("居住費用") -->
+   plot2 <- 
+     ggplot(housing, aes(x = f, y = ZINC2, color = f, group = f)) +
+     geom_boxplot() + 
+     ggtitle(paste0(colnames(hads.cate)[i], "*ZINC2 boxplot")) + 
+     xlab(colnames(hads.cate)[i])
 
-<!-- ggplot(INCR,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + -->
-<!--   geom_vline(data=INCR.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + -->
-<!--   ggtitle("家庭收入") -->
+grid.arrange(plot1, plot2, nrow = 2) 
 
-<!-- ``` -->
+} 
 
-<!-- ```{r continuous plot2, echo=FALSE} -->
+```
 
-<!-- for (i in 1:14) { -->
-<!--   par(mfrow=c(2, 1)) -->
+從圖形中我們可以發現，房間數越多，通常其家庭收入亦越多，但在房間數大於5後，反而會有平均收入下降的趨勢，離群值也隨著房間數增加，在大於5的房間之後離群值數量也有下降，數值也降低，房東與承租租者狀態分數越高，家庭收入卻越少，離群值的數量與數值也隨分數增加而下降，不同的普查地區出現的家庭收入分布接近一致，不過，郊區的家庭收入亦較市中心也比其他2者高，適當的家戶收入分佈較不適當的家戶高，建物的規模越大，家戶收入卻越低，單位臥室數分級數值越高，家戶收入也越高，自有住宅者的家戶收入也比租屋者高
 
-<!--   plot(density(single.cont[, i], na.rm=T), -->
-<!--        main=paste(colnames(single.cont)[i], "distribution")) -->
-<!--   boxplot(single.cont[, i], -->
-<!--           main=paste(colnames(single.cont)[i], "boxplot"), horizontal=T) -->
-<!-- } -->
 
-<!-- ``` -->
+```{r continuous plot1, echo=FALSE} 
 
-<!-- ```{r corr plot, echo=FALSE} -->
+ggplot(L,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + 
+   geom_vline(data=L.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + 
+   ggtitle("低收入")
 
-<!-- corrplot::corrplot(cor.cont, method="circle", col=my.col, -->
-<!--                    tl.col="black", tl.srt=45, diag=FALSE) -->
+ggplot(ABL,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + 
+   geom_vline(data=ABL.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + 
+   ggtitle("對房間數調整後的低收入") 
 
-<!-- ``` -->
+ggplot(GL,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + 
+   geom_vline(data=GL.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + 
+   ggtitle("調漲後的收入") 
+
+ggplot(COST,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + 
+   geom_vline(data=COST.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) +
+   ggtitle("居住費用") 
+
+ggplot(INCR,aes(x=value, fill=variable)) + geom_density(alpha=0.5) + 
+   geom_vline(data=INCR.mu, aes(xintercept=mu, color=variable), linetype="dashed", size=1) + 
+   ggtitle("家庭收入") 
+
+``` 
+
+```{r continuous plot2, echo=FALSE} 
+
+for (i in 1:14) { 
+   par(mfrow=c(2, 1)) 
+
+   plot(density(single.cont[, i], na.rm=T), 
+        main=paste(colnames(single.cont)[i], "distribution")) 
+   boxplot(single.cont[, i], 
+           main=paste(colnames(single.cont)[i], "boxplot"), horizontal=T) 
+ } 
+
+``` 
+
+<!--```{r corr plot, echo=FALSE}-->
+<!--corrplot::corrplot(cor.cont, method="circle", col=my.col,-->
+<!--                    tl.col="black", tl.srt=45, diag=FALSE)-->
+<!--``` -->
 
 ```{r plot, echo=FALSE}
 pie <- function(x){
